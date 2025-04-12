@@ -57,12 +57,12 @@ export default function ApplicationTable() {
               <TableHead>Position</TableHead>
               <TableHead>Location</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Match %</TableHead>
-              <TableHead>Keyword</TableHead>
               <TableHead>Job Posting</TableHead>
               <TableHead>Resume</TableHead>
               <TableHead>Cover Letter</TableHead>
               <TableHead>Transcript</TableHead>
+              <TableHead>Match %</TableHead>
+              <TableHead>Keyword</TableHead>
             </TableRow>
           </TableHeader>
 

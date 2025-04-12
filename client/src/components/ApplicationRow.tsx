@@ -1,12 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TableRow, TableCell } from "@/components/ui/table";
-import StatusBadge from "./StatusBadge";
-import { FaCheckCircle } from "react-icons/fa";
+import { FaCheckCircle, FaEdit } from "react-icons/fa";
 import StatusSelector from "./StatusSelector";
 
 type StatusType = "saved" | "applied" | "interview" | "offered" | "rejected";
+
+const debounce = (func: Function, delay: number) => {
+  let timer: ReturnType<typeof setTimeout>;
+  return (...args: any[]) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => func(...args), delay);
+  };
+};
 
 export default function ApplicationRow() {
   const [company, setCompany] = useState("");
@@ -21,10 +28,23 @@ export default function ApplicationRow() {
     job_posting: "",
   });
 
+  const saveApplicationToDB = debounce((data: any) => {
+    console.log("Saving to DB: ", data);
+  }, 800);
+
+  useEffect(() => {
+    saveApplicationToDB({
+      company,
+      position,
+      location,
+      status,
+      uploadedFiles,
+    });
+  }, [company, position, location, status, uploadedFiles]);
+
   const handleFileUpload = (fileType: string, file: File | null) => {
     if (file) {
       setUploadedFiles((prev) => ({ ...prev, [fileType]: file.name }));
-      console.log(`[${fileType}] uploaded: ${file.name}`);
     }
   };
 
@@ -34,22 +54,34 @@ export default function ApplicationRow() {
     className = "w-[240px]"
   ) => (
     <TableCell className={className}>
-      <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded text-sm hover:bg-slate-200">
-        {label}
-        <input
-          type="file"
-          className="hidden"
-          onChange={(e) =>
-            handleFileUpload(fileType, e.target.files?.[0] || null)
-          }
-        />
-      </label>
-
-      {uploadedFiles[fileType] && (
-        <span className="mt-1 text-xs text-gray-600 flex items-center gap-1 truncate max-w-[220px]">
-          <FaCheckCircle className="text-green-500" />
-          {uploadedFiles[fileType]}
-        </span>
+      {uploadedFiles[fileType] ? (
+        <div className="flex items-center gap-4">
+          <span className="mt-1 text-md text-gray-600 flex items-center gap-2 truncate max-w-[220px]">
+            <FaCheckCircle className="text-green-500" />
+            {uploadedFiles[fileType]}
+          </span>
+          <label className="cursor-pointer text-blue-500 hover:text-blue-700">
+            <FaEdit className="text-lg translate-y-[2px]" />
+            <input
+              type="file"
+              className="hidden"
+              onChange={(e) =>
+                handleFileUpload(fileType, e.target.files?.[0] || null)
+              }
+            />
+          </label>
+        </div>
+      ) : (
+        <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded text-sm hover:bg-slate-200">
+          {label}
+          <input
+            type="file"
+            className="hidden"
+            onChange={(e) =>
+              handleFileUpload(fileType, e.target.files?.[0] || null)
+            }
+          />
+        </label>
       )}
     </TableCell>
   );
