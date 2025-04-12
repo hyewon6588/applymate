@@ -1,0 +1,21 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from routes.upload import router as upload_router
+
+app = FastAPI()
+
+# Allow frontend (localhost:3000) to access this API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Update this in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include upload routes
+app.include_router(upload_router)
+
+@app.get("/")
+def root():
+    return {"message": "ApplyMate API is running."}
