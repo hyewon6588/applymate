@@ -4,7 +4,8 @@
 
 import { useState, useEffect } from "react";
 import StatusSelector from "./StatusSelector";
-import { FaCheckCircle, FaEdit } from "react-icons/fa";
+import { FaCheckCircle } from "react-icons/fa";
+import { FiEdit2 } from "react-icons/fi";
 
 type StatusType = "saved" | "applied" | "interview" | "offered" | "rejected";
 
@@ -58,7 +59,7 @@ export default function ApplicationCard() {
             {uploadedFiles[type]}
           </span>
           <label className="cursor-pointer text-blue-500 hover:text-blue-700">
-            <FaEdit className="text-lg translate-y-[2px]" />
+            <FiEdit2 className="text-lg translate-y-[2px]" />
             <input
               type="file"
               className="hidden"
