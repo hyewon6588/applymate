@@ -1,22 +1,28 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from models.application_model import save_application
+from typing import Optional
 
 router = APIRouter()
 
+class FileMetadata(BaseModel):
+    name: str
+    url: str
+
 # Schema for uploaded file names
 class UploadedFiles(BaseModel):
-    resume: str = ""
-    coverletter: str = ""
-    transcript: str = ""
-    job_posting: str = ""
+    resume: Optional[FileMetadata] = ""
+    coverletter: Optional[FileMetadata] = ""
+    transcript: Optional[FileMetadata] = ""
+    job_posting: Optional[FileMetadata] = ""
 
 # Schema for application payload
 class ApplicationPayload(BaseModel):
-    company: str
-    position: str
-    location: str
-    status: str
+    application_id: Optional[str] = None
+    company: Optional[str] = ""
+    position: Optional[str] = ""
+    location: Optional[str] = ""
+    status: Optional[str] = ""
     uploadedFiles: UploadedFiles
 
 @router.post("/applications")

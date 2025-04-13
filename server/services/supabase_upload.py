@@ -18,7 +18,7 @@ headers = {
     "Content-Type": "application/octet-stream"
 }
 
-async def upload_to_supabase(file, user_id: str, file_type: str = "resume"):
+async def upload_to_supabase(file, user_id: str,company:str = "unknown",position:str = "unknown", file_type: str = "resume"):
     file_bytes = await file.read()
     file_size = len(file_bytes)
 
@@ -28,8 +28,9 @@ async def upload_to_supabase(file, user_id: str, file_type: str = "resume"):
 
     # 2. Construct path: applications/{user_id}/{file_type}/{uuid_filename}
     filename = f"{uuid.uuid4().hex}_{file.filename}"
-    path = f"{user_id}/{file_type}/{filename}"
+    path = f"{user_id}/{company}/{position}/{file_type}/{filename}"
     upload_url = f"{SUPABASE_URL}/storage/v1/object/applications/{path}"
+
 
     # 3. Upload to Supabase
     response = requests.post(upload_url, headers=headers, data=file_bytes)
@@ -40,4 +41,4 @@ async def upload_to_supabase(file, user_id: str, file_type: str = "resume"):
     # 4. Return public URL and size
     public_url = f"{SUPABASE_URL}/storage/v1/object/public/applications/{path}"
 
-    return {"public_url": public_url, "size": file_size}
+    return {"public_url": public_url,"original_name": file.filename, "size": file_size}

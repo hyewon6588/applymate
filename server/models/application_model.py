@@ -16,14 +16,25 @@ uploads_collection = db["uploaded_files"]
 
 def save_application(data: dict) -> str:
     """
-    Save full application entry to the 'applications' collection.
-    Includes company info, status, uploaded file names, etc.
+    Upsert application entry by application_id.
+    If not present, create new one. Otherwise, update existing.
     """
-    data["uploaded_at"] = datetime.utcnow()
-    result = applications_collection.insert_one(data)
-    return str(result.inserted_id)
+    application_id = data.get("application_id")
+    if not application_id:
+        raise ValueError("Missing application_id")
 
-def save_resume_entry(user_id: str, file_type: str, url: str, size: int):
+    result = applications_collection.update_one(
+        {"application_id": application_id},
+        {
+            "$set": data,
+            "$setOnInsert": {"uploaded_at": datetime.utcnow()}
+        },
+        upsert=True
+    )
+
+    return str(result.upserted_id) if result.upserted_id else "updated"
+
+def save_resume_entry(user_id: str, file_type: str, file_info: dict, size: int):
     """
     Save a record of uploaded files (resume, cover letter, etc.) to a separate collection.
     Stores user ID, file type, public URL, and size.
@@ -31,7 +42,8 @@ def save_resume_entry(user_id: str, file_type: str, url: str, size: int):
     entry = {
         "user_id": user_id,
         "file_type": file_type,  # e.g. resume, coverletter, transcript, job_posting
-        "url": url,
+        "name": file_info["name"],
+        "url": file_info["url"],
         "size": size,
         "uploaded_at": datetime.utcnow()
     }

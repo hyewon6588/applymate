@@ -8,6 +8,11 @@ import StatusSelector from "./StatusSelector";
 
 type StatusType = "saved" | "applied" | "interview" | "offered" | "rejected";
 
+type UploadedFileEntry = {
+  name: string;
+  url: string;
+};
+
 const debounce = (func: Function, delay: number) => {
   let timer: ReturnType<typeof setTimeout>;
   return (...args: any[]) => {
@@ -17,24 +22,38 @@ const debounce = (func: Function, delay: number) => {
 };
 
 export default function ApplicationRow() {
+  const [applicationId] = useState(() => Date.now().toString());
   const [company, setCompany] = useState("");
   const [position, setPosition] = useState("");
   const [location, setLocation] = useState("");
   const [status, setStatus] = useState<StatusType>("saved");
 
-  const [uploadedFiles, setUploadedFiles] = useState<Record<string, string>>({
-    resume: "",
-    coverletter: "",
-    transcript: "",
-    job_posting: "",
+  const [uploadedFiles, setUploadedFiles] = useState<
+    Record<string, UploadedFileEntry>
+  >({
+    // resume: "",
+    // coverletter: "",
+    // transcript: "",
+    // job_posting: "",
   });
 
-  const saveApplicationToDB = debounce((data: any) => {
-    console.log("Saving to DB: ", data);
+  const saveApplicationToDB = debounce(async (data: any) => {
+    try {
+      const res = await fetch("http://localhost:8000/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      console.log("✅ Synced to backend:", result);
+    } catch (err) {
+      console.error("❌ Save failed:", err);
+    }
   }, 800);
 
   useEffect(() => {
     saveApplicationToDB({
+      application_id: applicationId,
       company,
       position,
       location,
@@ -43,9 +62,35 @@ export default function ApplicationRow() {
     });
   }, [company, position, location, status, uploadedFiles]);
 
-  const handleFileUpload = (fileType: string, file: File | null) => {
-    if (file) {
-      setUploadedFiles((prev) => ({ ...prev, [fileType]: file.name }));
+  const handleFileUpload = async (fileType: string, file: File | null) => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("file_type", fileType);
+    formData.append("user_id", "demo_user"); // Replace when auth is added
+    formData.append("company", company);
+    formData.append("position", position);
+
+    try {
+      const res = await fetch("http://localhost:8000/upload/resume", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const { url } = await res.json();
+
+      setUploadedFiles((prev) => ({
+        ...prev,
+        [fileType]: {
+          name: file.name,
+          url,
+        },
+      }));
+    } catch (err) {
+      console.error(`❌ ${fileType} upload failed`, err);
     }
   };
 
@@ -59,7 +104,7 @@ export default function ApplicationRow() {
         <div className="flex items-center gap-4">
           <span className="mt-1 text-md text-gray-600 flex items-center gap-2 truncate max-w-[220px]">
             <FaCheckCircle className="text-green-500" />
-            {uploadedFiles[fileType]}
+            {uploadedFiles[fileType]?.name}
           </span>
           <label className="cursor-pointer text-blue-500 hover:text-blue-700">
             <FiEdit2 className="text-lg translate-y-[2px]" />
