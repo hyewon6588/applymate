@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 import ApplicationRow from "./ApplicationRow";
 import ApplicationCard from "./ApplicationCard";
 import {
@@ -14,11 +15,38 @@ import { Button } from "@/components/ui/button";
 import useIsMobile from "@/hooks/useIsMobile";
 
 export default function ApplicationTable() {
-  const [rows, setRows] = useState<number[]>([]);
-  const addRow = () => setRows((prev) => [...prev, Date.now()]);
+  const [rows, setRows] = useState<any[]>([]);
+  // const addRow = () => setRows((prev) => [...prev, Date.now()]);
   const isMobile = useIsMobile();
 
   const isEmpty = rows.length === 0;
+
+  const addRow = () => {
+    setRows((prev) => [
+      ...prev,
+      {
+        application_id: uuidv4(),
+        company: "",
+        position: "",
+        location: "",
+        status: "saved",
+        uploadedFiles: {},
+      },
+    ]);
+  };
+  // Fetch existing applications from backend
+  const fetchApplications = async () => {
+    try {
+      const res = await fetch("http://localhost:8000/applications/demo_user");
+      const data = await res.json();
+      setRows(data);
+    } catch (err) {
+      console.error("❌ Failed to fetch applications", err);
+    }
+  };
+  useEffect(() => {
+    fetchApplications();
+  }, []);
 
   return (
     <div className="w-full overflow-x-auto px-2 sm:px-4">
@@ -45,8 +73,8 @@ export default function ApplicationTable() {
         </div>
       ) : isMobile ? (
         <div className="space-y-4">
-          {rows.map((key) => (
-            <ApplicationCard key={`card-${key}`} />
+          {rows.map((data) => (
+            <ApplicationCard key={data.application_id} initialData={data} />
           ))}
         </div>
       ) : (
@@ -67,8 +95,8 @@ export default function ApplicationTable() {
           </TableHeader>
 
           <TableBody>
-            {rows.map((key) => (
-              <ApplicationRow key={key} />
+            {rows.map((data) => (
+              <ApplicationRow key={data.application_id} initialData={data} />
             ))}
           </TableBody>
         </Table>

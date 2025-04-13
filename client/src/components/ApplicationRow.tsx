@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { FaCheckCircle } from "react-icons/fa";
 import { FiEdit2 } from "react-icons/fi";
@@ -13,6 +13,18 @@ type UploadedFileEntry = {
   url: string;
 };
 
+type ApplicationRowProps = {
+  initialData: {
+    application_id: string;
+    user_id?: string;
+    company: string;
+    position: string;
+    location: string;
+    status: StatusType;
+    uploadedFiles: Record<string, UploadedFileEntry | null>;
+  };
+};
+
 const debounce = (func: Function, delay: number) => {
   let timer: ReturnType<typeof setTimeout>;
   return (...args: any[]) => {
@@ -21,21 +33,34 @@ const debounce = (func: Function, delay: number) => {
   };
 };
 
-export default function ApplicationRow() {
-  const [applicationId] = useState(() => Date.now().toString());
-  const [company, setCompany] = useState("");
-  const [position, setPosition] = useState("");
-  const [location, setLocation] = useState("");
-  const [status, setStatus] = useState<StatusType>("saved");
+export default function ApplicationRow({ initialData }: ApplicationRowProps) {
+  const [applicationId] = useState(initialData.application_id);
+  const [userId] = useState("demo_user");
+
+  const [company, setCompany] = useState(initialData.company || "");
+  const [position, setPosition] = useState(initialData.position || "");
+  const [location, setLocation] = useState(initialData.location || "");
+  const [status, setStatus] = useState<StatusType>(
+    initialData.status || "saved"
+  );
 
   const [uploadedFiles, setUploadedFiles] = useState<
-    Record<string, UploadedFileEntry>
+    Record<string, UploadedFileEntry | null>
   >({
-    // resume: "",
-    // coverletter: "",
-    // transcript: "",
-    // job_posting: "",
+    resume: initialData.uploadedFiles?.resume ?? null,
+    coverletter: initialData.uploadedFiles?.coverletter ?? null,
+    transcript: initialData.uploadedFiles?.transcript ?? null,
+    job_posting: initialData.uploadedFiles?.job_posting ?? null,
   });
+
+  const didMount = useRef(false);
+  const isNewRow = useRef(
+    initialData.company === "" &&
+      initialData.position === "" &&
+      initialData.location === "" &&
+      Object.values(initialData.uploadedFiles || {}).every((f) => !f?.url)
+  );
+  const hasChanged = useRef(false);
 
   const saveApplicationToDB = debounce(async (data: any) => {
     try {
@@ -52,8 +77,23 @@ export default function ApplicationRow() {
   }, 800);
 
   useEffect(() => {
+    didMount.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!didMount.current || isNewRow.current || !hasChanged.current) return;
+
+    hasChanged.current = false;
+
+    const hasFile = Object.values(uploadedFiles).some(
+      (f) => f?.url && f.url.length > 0
+    );
+
+    if (!company && !position && !location && !hasFile) return;
+
     saveApplicationToDB({
       application_id: applicationId,
+      user_id: userId,
       company,
       position,
       location,
@@ -65,10 +105,13 @@ export default function ApplicationRow() {
   const handleFileUpload = async (fileType: string, file: File | null) => {
     if (!file) return;
 
+    isNewRow.current = false;
+    hasChanged.current = true;
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("file_type", fileType);
-    formData.append("user_id", "demo_user"); // Replace when auth is added
+    formData.append("user_id", userId);
     formData.append("company", company);
     formData.append("position", position);
 
@@ -100,7 +143,7 @@ export default function ApplicationRow() {
     className = "w-[240px]"
   ) => (
     <TableCell className={className}>
-      {uploadedFiles[fileType] ? (
+      {uploadedFiles[fileType]?.url ? (
         <div className="flex items-center gap-4">
           <span className="mt-1 text-md text-gray-600 flex items-center gap-2 truncate max-w-[220px]">
             <FaCheckCircle className="text-green-500" />
@@ -134,60 +177,56 @@ export default function ApplicationRow() {
 
   return (
     <TableRow className="text-sm [&>td]:py-3">
-      {/* Company */}
       <TableCell className="min-w-[220px]">
         <input
           type="text"
           value={company}
-          onChange={(e) => setCompany(e.target.value)}
+          onChange={(e) => {
+            isNewRow.current = false;
+            hasChanged.current = true;
+            setCompany(e.target.value);
+          }}
           className="w-full px-2 py-1 text-sm border border-gray-300 rounded-sm"
         />
       </TableCell>
-
-      {/* Position */}
       <TableCell className="min-w-[220px]">
         <input
           type="text"
           value={position}
-          onChange={(e) => setPosition(e.target.value)}
+          onChange={(e) => {
+            isNewRow.current = false;
+            hasChanged.current = true;
+            setPosition(e.target.value);
+          }}
           className="w-full px-2 py-1 text-sm border border-gray-300 rounded-sm"
         />
       </TableCell>
-
-      {/* Location */}
       <TableCell className="min-w-[220px]">
         <input
           type="text"
           value={location}
-          onChange={(e) => setLocation(e.target.value)}
+          onChange={(e) => {
+            isNewRow.current = false;
+            hasChanged.current = true;
+            setLocation(e.target.value);
+          }}
           className="w-full px-2 py-1 text-sm border border-gray-300 rounded-sm"
         />
       </TableCell>
-
-      {/* Status Badge + Change */}
       <TableCell className="min-w-[160px]">
-        <StatusSelector value={status} onChange={setStatus} />
+        <StatusSelector
+          value={status}
+          onChange={(val) => {
+            isNewRow.current = false;
+            hasChanged.current = true;
+            setStatus(val);
+          }}
+        />
       </TableCell>
-
-      {/* File Upload Cells */}
-      {renderFileCell(
-        "Add Job Posting",
-        "job_posting",
-        "min-w-[240px] max-w-[280px]"
-      )}
-      {renderFileCell("Upload Resume", "resume", "min-w-[240px] max-w-[280px]")}
-      {renderFileCell(
-        "Attach Cover Letter",
-        "coverletter",
-        "min-w-[240px] max-w-[280px]"
-      )}
-      {renderFileCell(
-        "Upload Transcript",
-        "transcript",
-        "min-w-[240px] max-w-[280px]"
-      )}
-
-      {/* Match %, Keyword Check */}
+      {renderFileCell("Add Job Posting", "job_posting")}
+      {renderFileCell("Upload Resume", "resume")}
+      {renderFileCell("Attach Cover Letter", "coverletter")}
+      {renderFileCell("Upload Transcript", "transcript")}
       <TableCell className="min-w-[160px]">—</TableCell>
       <TableCell className="min-w-[160px]">—</TableCell>
     </TableRow>

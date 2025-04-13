@@ -14,6 +14,12 @@ db = client["applymate"]
 applications_collection = db["applications"]
 uploads_collection = db["uploaded_files"]
 
+def get_applications_by_user_id(user_id: str):
+    apps = list(applications_collection.find({"user_id": user_id}))
+    for app in apps:
+        app["_id"] = str(app["_id"])
+    return apps
+
 def save_application(data: dict) -> str:
     """
     Upsert application entry by application_id.
@@ -22,6 +28,9 @@ def save_application(data: dict) -> str:
     application_id = data.get("application_id")
     if not application_id:
         raise ValueError("Missing application_id")
+    user_id = data.get("user_id")
+    if not user_id:
+        raise ValueError("Missing user_id")
 
     result = applications_collection.update_one(
         {"application_id": application_id},
