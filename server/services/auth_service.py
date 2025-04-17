@@ -1,7 +1,8 @@
-from models.user_model import SignupRequest, UserInDB, UserPublic
-from utils.auth_utils import hash_password
+from models.user_model import SignupRequest, UserInDB, UserPublic, LoginRequest
+from utils.auth_utils import hash_password, verify_password, create_access_token
 from datetime import datetime
 from db.mongodb import user_collection
+from fastapi import HTTPException
 
 
 def create_user(user: SignupRequest) -> str:
@@ -16,3 +17,13 @@ def create_user(user: SignupRequest) -> str:
     }
     result = user_collection.insert_one(user_dict)
     return str(result.inserted_id)
+
+
+# Authenticate user during login
+def authenticate_user(login_data: LoginRequest) -> str:
+    user = user_collection.find_one({"username": login_data.username})
+    if not user or not verify_password(login_data.password, user["password_hash"]):
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+
+    token = create_access_token({"sub": user["username"]})
+    return token

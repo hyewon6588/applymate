@@ -26,3 +26,7 @@ class UserPublic(BaseModel):
     email: EmailStr
     first_name: str
     last_name: str
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
