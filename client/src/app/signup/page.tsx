@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -26,13 +26,38 @@ export default function SignupPage() {
     last_name: "",
   });
   const [error, setError] = useState<string | null>(null);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(
+    null
+  );
+
+  // Debounced username check
+  useEffect(() => {
+    if (!form.username) {
+      setUsernameAvailable(null);
+      return;
+    }
+
+    const timeout = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:8000/auth/check-username?username=${form.username}`
+        );
+        const data = await res.json();
+        setUsernameAvailable(data.available);
+      } catch (err) {
+        console.error("Username check failed:", err);
+        setUsernameAvailable(null);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [form.username]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSignup = async () => {
-    // Client-side validation
     if (
       !form.username ||
       !form.password ||
@@ -47,6 +72,11 @@ export default function SignupPage() {
 
     if (form.password !== form.confirmPassword) {
       setError("Passwords do not match.");
+      return;
+    }
+
+    if (usernameAvailable === false) {
+      setError("Username is already taken.");
       return;
     }
 
@@ -71,7 +101,6 @@ export default function SignupPage() {
         return;
       }
 
-      // Signup success
       alert("Signup successful!");
       router.push("/login");
     } catch (err) {
@@ -87,7 +116,6 @@ export default function SignupPage() {
         style={{ marginRight: "60px" }}
       >
         <Logo />
-        {/* Illustration with quote included */}
         <Image
           src="/pictures/illustration_signup.png"
           alt="Sign up illustration"
@@ -96,7 +124,7 @@ export default function SignupPage() {
           className="object-contain"
         />
       </div>
-      {/* Signup form card */}
+
       <Card className="w-full max-w-md shadow-md mt-30">
         <CardHeader>
           <CardTitle className="text-2xl text-center font-bold">
@@ -110,6 +138,23 @@ export default function SignupPage() {
             value={form.username}
             onChange={handleChange}
           />
+          {form.username && (
+            <p
+              className={`text-sm ${
+                usernameAvailable === null
+                  ? "text-gray-500"
+                  : usernameAvailable
+                  ? "text-green-600"
+                  : "text-red-500"
+              }`}
+            >
+              {usernameAvailable === null
+                ? "Checking availability..."
+                : usernameAvailable
+                ? "Username is available."
+                : "Username is already taken."}
+            </p>
+          )}
           <Input
             type="password"
             name="password"
