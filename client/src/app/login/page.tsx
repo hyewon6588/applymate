@@ -21,8 +21,6 @@ import Logo from "@/components/Logo";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [form, setForm] = useState({
     username: "",
     password: "",
@@ -36,10 +34,11 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await login({ username, password });
+    const res = await login(form);
 
     if (res.access_token) {
       localStorage.setItem("token", res.access_token);
+      alert("Login successful!");
       router.push("/applications");
     } else {
       alert("Login failed");
@@ -70,13 +69,23 @@ export default function LoginPage() {
             value={form.username}
             onChange={handleChange}
           />
-          <Input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleChange}
-          />
+          <div className="relative">
+            <Input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+              className="pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button className="w-full mt-2" onClick={handleLogin}>

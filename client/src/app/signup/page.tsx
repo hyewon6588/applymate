@@ -204,3 +204,5 @@ export default function SignupPage() {
     </BackgroundSection>
   );
 }
+
+///to add: email verification, alert, responsive design, oAuth
