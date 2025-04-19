@@ -23,6 +23,7 @@ type ApplicationRowProps = {
     location: string;
     status: StatusType;
     uploadedFiles: Record<string, UploadedFileEntry | null>;
+    match_score?: number;
   };
 };
 
@@ -70,6 +71,11 @@ export default function ApplicationRow({ initialData }: ApplicationRowProps) {
     transcript: initialData.uploadedFiles?.transcript ?? null,
     job_posting: initialData.uploadedFiles?.job_posting ?? null,
   });
+
+  const [matchScore, setMatchScore] = useState<number | null>(
+    initialData.match_score ?? null
+  );
+  const [isCheckingMatch, setIsCheckingMatch] = useState(false);
 
   const didMount = useRef(false);
   const isNewRow = useRef(
@@ -125,6 +131,7 @@ export default function ApplicationRow({ initialData }: ApplicationRowProps) {
 
     isNewRow.current = false;
     hasChanged.current = true;
+    setMatchScore(null);
 
     const formData = new FormData();
     formData.append("file", file);
@@ -152,6 +159,22 @@ export default function ApplicationRow({ initialData }: ApplicationRowProps) {
       }));
     } catch (err) {
       console.error(`❌ ${fileType} upload failed`, err);
+    }
+  };
+
+  const handleCheckMatch = async () => {
+    setIsCheckingMatch(true);
+    try {
+      const res = await fetch(
+        `http://localhost:8000/applications/${applicationId}/analyze-match`,
+        { method: "POST" }
+      );
+      const result = await res.json();
+      setMatchScore(result.match_score);
+    } catch (err) {
+      console.error("❌ Match score fetch failed", err);
+    } finally {
+      setIsCheckingMatch(false);
     }
   };
 
@@ -192,6 +215,9 @@ export default function ApplicationRow({ initialData }: ApplicationRowProps) {
       )}
     </TableCell>
   );
+
+  const resumeReady = !!uploadedFiles.resume?.url;
+  const jdReady = !!uploadedFiles.job_posting?.url;
 
   return (
     <TableRow className="text-sm [&>td]:py-3">
@@ -245,7 +271,22 @@ export default function ApplicationRow({ initialData }: ApplicationRowProps) {
       {renderFileCell("Upload Resume", "resume")}
       {renderFileCell("Attach Cover Letter", "coverletter")}
       {renderFileCell("Upload Transcript", "transcript")}
-      <TableCell className="min-w-[160px]">—</TableCell>
+      {/* Match % */}
+      <TableCell className="min-w-[160px]">
+        {matchScore !== null ? (
+          <span className="text-green-700 font-semibold">{matchScore}%</span>
+        ) : resumeReady && jdReady ? (
+          <button
+            onClick={handleCheckMatch}
+            disabled={isCheckingMatch}
+            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm"
+          >
+            {isCheckingMatch ? "Checking..." : "Check Match"}
+          </button>
+        ) : (
+          <span className="text-gray-400 text-sm">—</span>
+        )}
+      </TableCell>
       <TableCell className="min-w-[160px]">—</TableCell>
     </TableRow>
   );

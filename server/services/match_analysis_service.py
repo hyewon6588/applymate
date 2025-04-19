@@ -32,13 +32,7 @@ def evaluate_model_accuracy():
     print(f"✅ [Model Eval] Accuracy within ±10%: {within_10 * 100:.1f}%\n")
 
 def analyze_match_and_keywords(application_id: str) -> dict:
-    try:
-        object_id = ObjectId(application_id)
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid ObjectId format")
-
-    # Fetch application
-    app = application_collection.find_one({"_id": object_id})
+    app = application_collection.find_one({"application_id": application_id})
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
 
@@ -61,7 +55,7 @@ def analyze_match_and_keywords(application_id: str) -> dict:
 
     # Step 3: Update database
     application_collection.update_one(
-        {"_id": application_id},
+        {"application_id": application_id},
         {"$set": {
             "match_score": match_percent,
             "match_keywords": keywords

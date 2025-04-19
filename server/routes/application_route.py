@@ -27,8 +27,6 @@ class ApplicationPayload(BaseModel):
     location: Optional[str] = ""
     status: Optional[str] = ""
     uploadedFiles: UploadedFiles
-    matchPercentage: Optional[float] = None
-    keywordFeedback: Optional[List[str]] = []
 
 
 @router.get("/applications/me")
