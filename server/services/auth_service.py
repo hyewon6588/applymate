@@ -25,5 +25,10 @@ def authenticate_user(login_data: LoginRequest) -> str:
     if not user or not verify_password(login_data.password, user["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
-    token = create_access_token({"sub": user["username"]})
+    payload = {
+        "sub": str(user["_id"]),
+        "username": user["username"]
+    }
+
+    token = create_access_token(payload)
     return token

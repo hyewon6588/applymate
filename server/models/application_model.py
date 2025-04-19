@@ -1,7 +1,10 @@
+from fastapi import HTTPException
 from pymongo import MongoClient
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+from bson import ObjectId
+
 
 # Load environment variables
 load_dotenv()
@@ -11,13 +14,16 @@ client = MongoClient(os.getenv("MONGO_URI"))
 
 # Select database and collections
 db = client["applymate"]
+user_collection = db["users"]
 applications_collection = db["applications"]
 uploads_collection = db["uploaded_files"]
 
-def get_applications_by_user_id(user_id: str):
+def get_applications_by_userid(userid: str):
+    user_id = ObjectId(userid)
     apps = list(applications_collection.find({"user_id": user_id}))
     for app in apps:
         app["_id"] = str(app["_id"])
+        app["user_id"] = str(app["user_id"])
     return apps
 
 def save_application(data: dict) -> str:
@@ -31,6 +37,11 @@ def save_application(data: dict) -> str:
     user_id = data.get("user_id")
     if not user_id:
         raise ValueError("Missing user_id")
+    
+    try:
+        data["user_id"] = ObjectId(user_id)
+    except Exception:
+        raise ValueError("Invalid user_id format")
 
     result = applications_collection.update_one(
         {"application_id": application_id},

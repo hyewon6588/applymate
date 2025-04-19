@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException,Request
 from pydantic import BaseModel
-from models.application_model import save_application, get_applications_by_user_id
+from utils.auth_utils import decode_access_token
+from models.application_model import save_application, get_applications_by_userid
 from typing import Optional
 
 router = APIRouter()
@@ -26,10 +27,23 @@ class ApplicationPayload(BaseModel):
     status: Optional[str] = ""
     uploadedFiles: UploadedFiles
 
-@router.get("/applications/{user_id}")
-def get_applications(user_id: str):
+
+@router.get("/applications/me")
+def get_user_applications(request: Request):
+    auth_header = request.headers.get("Authorization")
+
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Authorization token missing")
+
+    token = auth_header.split(" ")[1]
+
     try:
-        return get_applications_by_user_id(user_id)
+        payload = decode_access_token(token)
+        userId = payload.get("sub")
+        if not userId:
+            raise HTTPException(status_code=401, detail="Invalid token")
+
+        return get_applications_by_userid(userId)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

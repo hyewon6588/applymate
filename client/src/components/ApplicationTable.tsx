@@ -37,13 +37,29 @@ export default function ApplicationTable() {
   // Fetch existing applications from backend
   const fetchApplications = async () => {
     try {
-      const res = await fetch("http://localhost:8000/applications/demo_user");
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found");
+        return;
+      }
+
+      const res = await fetch("http://localhost:8000/applications/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch");
+      }
+
       const data = await res.json();
       setRows(data);
     } catch (err) {
       console.error("❌ Failed to fetch applications", err);
     }
   };
+
   useEffect(() => {
     fetchApplications();
   }, []);

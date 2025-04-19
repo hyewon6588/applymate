@@ -5,6 +5,7 @@ import { TableRow, TableCell } from "@/components/ui/table";
 import { FaCheckCircle } from "react-icons/fa";
 import { FiEdit2 } from "react-icons/fi";
 import StatusSelector from "./StatusSelector";
+import { jwtDecode } from "jwt-decode";
 
 type StatusType = "saved" | "applied" | "interview" | "offered" | "rejected";
 
@@ -25,6 +26,23 @@ type ApplicationRowProps = {
   };
 };
 
+type JwtPayload = {
+  sub: string;
+  exp: number;
+};
+
+function getUserIdFromToken(): string | null {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+    const decoded = jwtDecode<JwtPayload>(token);
+    return decoded.sub;
+  } catch (err) {
+    console.error("❌ Failed to decode token:", err);
+    return null;
+  }
+}
+
 const debounce = (func: Function, delay: number) => {
   let timer: ReturnType<typeof setTimeout>;
   return (...args: any[]) => {
@@ -35,7 +53,7 @@ const debounce = (func: Function, delay: number) => {
 
 export default function ApplicationRow({ initialData }: ApplicationRowProps) {
   const [applicationId] = useState(initialData.application_id);
-  const [userId] = useState("demo_user");
+  const [userId] = useState(() => getUserIdFromToken() || "guest_user");
 
   const [company, setCompany] = useState(initialData.company || "");
   const [position, setPosition] = useState(initialData.position || "");
