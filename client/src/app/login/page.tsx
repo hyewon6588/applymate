@@ -49,7 +49,7 @@ export default function LoginPage() {
     <BackgroundSection>
       {/* Illustration */}
       <div className="flex flex-col justify-start">
-        <Logo />
+        <Logo size="large" />
         <img
           src="/pictures/illustration_login.png"
           alt="Login illustration"

@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException,Request
 from pydantic import BaseModel
 from utils.auth_utils import decode_access_token
 from models.application_model import save_application, get_applications_by_userid
-from typing import Optional
+from services.match_analysis_service import analyze_match_and_keywords
+from typing import List, Optional
 
 router = APIRouter()
 
@@ -26,6 +27,8 @@ class ApplicationPayload(BaseModel):
     location: Optional[str] = ""
     status: Optional[str] = ""
     uploadedFiles: UploadedFiles
+    matchPercentage: Optional[float] = None
+    keywordFeedback: Optional[List[str]] = []
 
 
 @router.get("/applications/me")
@@ -58,3 +61,18 @@ def create_application(application: ApplicationPayload):
         return {"message": "Application saved", "id": inserted_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@router.post("/applications/{application_id}/analyze-match")
+def analyze_match(application_id: str):
+    try:
+        result = analyze_match_and_keywords(application_id)
+        return {
+            "message": "Match score updated",
+            "match_score": result["match_score"],
+            "keywords": result["keywords"]
+        }
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

@@ -115,7 +115,7 @@ export default function SignupPage() {
         className="flex flex-col justify-start h-full mt-7"
         style={{ marginRight: "60px" }}
       >
-        <Logo />
+        <Logo size="large" />
         <Image
           src="/pictures/illustration_signup.png"
           alt="Sign up illustration"
