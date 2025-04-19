@@ -65,10 +65,10 @@ export default function ApplicationTable() {
   }, []);
 
   return (
-    <div className="w-full overflow-x-auto px-2 sm:px-4">
+    <div className="w-full px-2 sm:px-4 flex flex-col justify-center">
       {/* Top Button */}
       {!isEmpty && !isMobile && (
-        <div className="flex justify-end mb-6">
+        <div className="flex justify-end mb-4">
           <Button
             onClick={addRow}
             variant="outline"
@@ -94,7 +94,7 @@ export default function ApplicationTable() {
           ))}
         </div>
       ) : (
-        <Table className="w-full border text-sm">
+        <Table className="min-w-[1400] border text-sm">
           <TableHeader>
             <TableRow className="bg-gray-100 text-muted-foreground text-sm">
               <TableHead>Company</TableHead>

@@ -15,7 +15,7 @@ export default function StatusBadge({
         "px-3 py-1 rounded-full text-xs font-medium",
         color === "gray" && "bg-gray-200 text-gray-700",
         color === "blue" && "bg-blue-100 text-blue-700",
-        color === "indigo" && "bg-indigo-100 text-indigo-700",
+        color === "yellow" && "bg-yellow-200 text-yellow-700",
         color === "green" && "bg-green-100 text-green-700",
         color === "red" && "bg-red-100 text-red-700"
       )}
@@ -28,7 +28,7 @@ export default function StatusBadge({
 const statusMap = {
   saved: { label: "Saved", color: "gray" },
   applied: { label: "Applied", color: "blue" },
-  interview: { label: "Interview", color: "indigo" },
+  interview: { label: "Interview", color: "yellow" },
   offered: { label: "Offered", color: "green" },
   rejected: { label: "Rejected", color: "red" },
 } as const;
