@@ -1,0 +1,158 @@
+[
+  {
+    "resume": "Experienced Python developer with background in web scraping and API integration.",
+    "job_description": "Looking for a backend engineer skilled in Python and RESTful API design.",
+    "match_score": 87,
+    "expected_keywords": [
+      "backend",
+      "design",
+      "engineer",
+      "looking",
+      "restful",
+      "skilled"
+    ]
+  },
+  {
+    "resume": "Machine learning enthusiast with experience in sklearn, pandas, and TensorFlow.",
+    "job_description": "Hiring data scientists with experience in machine learning and data pipelines.",
+    "match_score": 91,
+    "expected_keywords": ["data", "hiring", "pipelines", "scientists"]
+  },
+  {
+    "resume": "Full-stack developer with React, Node.js, and MongoDB expertise.",
+    "job_description": "Frontend engineer needed with strong React and TypeScript skills.",
+    "match_score": 78,
+    "expected_keywords": [
+      "engineer",
+      "frontend",
+      "needed",
+      "skills",
+      "strong",
+      "typescript"
+    ]
+  },
+  {
+    "resume": "Cloud DevOps engineer skilled in AWS, Docker, and Kubernetes.",
+    "job_description": "DevOps role requires experience with CI/CD pipelines and Kubernetes clusters.",
+    "match_score": 89,
+    "expected_keywords": [
+      "cd",
+      "ci",
+      "clusters",
+      "experience",
+      "pipelines",
+      "requires",
+      "role"
+    ]
+  },
+  {
+    "resume": "Mobile app developer with Swift and Kotlin experience.",
+    "job_description": "Looking for iOS developer proficient in Swift and UI/UX design.",
+    "match_score": 84,
+    "expected_keywords": ["design", "ios", "looking", "proficient", "ui", "ux"]
+  },
+  {
+    "resume": "Cybersecurity analyst familiar with network protocols, firewalls, and intrusion detection.",
+    "job_description": "Seeking security expert for pen testing and firewall configuration.",
+    "match_score": 82,
+    "expected_keywords": [
+      "configuration",
+      "expert",
+      "firewall",
+      "pen",
+      "security",
+      "seeking",
+      "testing"
+    ]
+  },
+  {
+    "resume": "Project manager with PMP certification and experience in agile methodologies.",
+    "job_description": "Agile project manager needed to lead Scrum teams.",
+    "match_score": 86,
+    "expected_keywords": ["lead", "needed", "scrum", "teams"]
+  },
+  {
+    "resume": "UX designer skilled in Figma, prototyping, and user interviews.",
+    "job_description": "Hiring UI/UX designers with strong wireframing and usability testing skills.",
+    "match_score": 88,
+    "expected_keywords": [
+      "designers",
+      "hiring",
+      "skills",
+      "strong",
+      "testing",
+      "ui",
+      "usability",
+      "wireframing"
+    ]
+  },
+  {
+    "resume": "Frontend developer with Vue.js and responsive design experience.",
+    "job_description": "Looking for frontend engineer with modern JavaScript framework experience.",
+    "match_score": 75,
+    "expected_keywords": [
+      "engineer",
+      "framework",
+      "javascript",
+      "looking",
+      "modern"
+    ]
+  },
+  {
+    "resume": "Database administrator experienced in PostgreSQL and performance tuning.",
+    "job_description": "DBA role focused on SQL optimization and backup management.",
+    "match_score": 80,
+    "expected_keywords": [
+      "backup",
+      "dba",
+      "focused",
+      "management",
+      "optimization",
+      "role",
+      "sql"
+    ]
+  },
+  {
+    "resume": "AI researcher with publications in NLP and BERT fine-tuning.",
+    "job_description": "Hiring NLP specialist for question answering systems.",
+    "match_score": 92,
+    "expected_keywords": [
+      "answering",
+      "hiring",
+      "question",
+      "specialist",
+      "systems"
+    ]
+  },
+  {
+    "resume": "Embedded systems engineer with C++ and microcontroller experience.",
+    "job_description": "Engineer needed for IoT firmware development using C/C++.",
+    "match_score": 77,
+    "expected_keywords": ["development", "firmware", "iot", "needed", "using"]
+  },
+  {
+    "resume": "QA tester with Selenium, Cypress, and test automation background.",
+    "job_description": "Automation QA role with end-to-end testing expertise required.",
+    "match_score": 81,
+    "expected_keywords": ["end", "expertise", "required", "role", "testing"]
+  },
+  {
+    "resume": "BI developer proficient in Power BI, SQL, and business analytics.",
+    "job_description": "Hiring BI analysts with dashboarding and ETL skills.",
+    "match_score": 83,
+    "expected_keywords": ["analysts", "dashboarding", "etl", "hiring", "skills"]
+  },
+  {
+    "resume": "Technical writer with experience documenting REST APIs and SDKs.",
+    "job_description": "Looking for someone to write developer documentation and code samples.",
+    "match_score": 85,
+    "expected_keywords": [
+      "code",
+      "developer",
+      "documentation",
+      "looking",
+      "samples",
+      "write"
+    ]
+  }
+]

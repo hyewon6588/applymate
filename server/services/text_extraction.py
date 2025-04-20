@@ -1,30 +1,13 @@
-import requests
-from bs4 import BeautifulSoup
-
-def extract_text_from_url(url: str) -> str:
-    """
-    Fetches and extracts text content from a URL pointing to a .docx or .pdf file.
-    For now, only extracts raw response text or HTML preview as fallback.
-    """
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        content_type = response.headers.get("Content-Type", "")
-
-        # Fallback if actual parsing (e.g. PDF, DOCX) is not implemented
-        if "text" in content_type or "html" in content_type:
-            soup = BeautifulSoup(response.text, "html.parser")
-            return soup.get_text()
-        else:
-            return response.text[:3000]  # fallback: limit to 3k chars
-    except Exception as e:
-        print(f"Failed to extract from {url}: {e}")
-        return ""
-    
 # services/text_extraction.py
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import requests
+import tempfile
+from pathlib import Path
+from docx import Document
+from urllib.parse import urlparse
+import os
 
 def compute_tfidf_similarity(resume_text, jd_text):
     tfidf = TfidfVectorizer(stop_words="english")
@@ -36,3 +19,32 @@ def compute_keyword_overlap(resume_text, jd_text):
     jd_tokens = set(re.findall(r"\b\w+\b", jd_text.lower()))
     return len(r_tokens & jd_tokens) / len(jd_tokens) if jd_tokens else 0
 
+def extract_text_from_url(file_url: str) -> str:
+    """
+    Downloads a .docx file from a URL, extracts visible text only (ignores images).
+    Returns cleaned paragraph text.
+    """
+    try:
+        # Download file
+        response = requests.get(file_url)
+        response.raise_for_status()
+
+        # Save to temp file
+        parsed_url = urlparse(file_url)
+        file_ext = os.path.splitext(parsed_url.path)[-1] or ".docx"
+
+        with tempfile.NamedTemporaryFile(suffix=file_ext, delete=False) as tmp_file:
+            tmp_file.write(response.content)
+            tmp_path = Path(tmp_file.name)
+
+        # Parse .docx and extract text
+        document = Document(tmp_path)
+        paragraphs = [
+            p.text.strip() for p in document.paragraphs if p.text.strip()
+        ]
+
+        return "\n".join(paragraphs)
+
+    except Exception as e:
+        print("❌ Failed to extract text from URL:", e)
+        return ""

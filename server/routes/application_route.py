@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from utils.auth_utils import decode_access_token
 from models.application_model import save_application, get_applications_by_userid
 from services.match_analysis_service import analyze_match_and_keywords
+from services.keyword_feedback_service import analyze_and_store_keyword_feedback
 from typing import List, Optional
 
 router = APIRouter()
@@ -74,3 +75,6 @@ def analyze_match(application_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.post("/applications/{application_id}/keyword-feedback")
+def generate_keyword_feedback(application_id: str):
+    return analyze_and_store_keyword_feedback(application_id)
