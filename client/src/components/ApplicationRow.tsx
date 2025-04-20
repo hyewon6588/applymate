@@ -25,6 +25,7 @@ type ApplicationRowProps = {
     uploadedFiles: Record<string, UploadedFileEntry | null>;
     match_score?: number;
   };
+  onShowKeywordFeedback: (applicationId: string) => void;
 };
 
 type JwtPayload = {
@@ -52,7 +53,10 @@ const debounce = (func: Function, delay: number) => {
   };
 };
 
-export default function ApplicationRow({ initialData }: ApplicationRowProps) {
+export default function ApplicationRow({
+  initialData,
+  onShowKeywordFeedback,
+}: ApplicationRowProps) {
   const [applicationId] = useState(initialData.application_id);
   const [userId] = useState(() => getUserIdFromToken() || "guest_user");
 
@@ -287,7 +291,18 @@ export default function ApplicationRow({ initialData }: ApplicationRowProps) {
           <span className="text-gray-400 text-sm">—</span>
         )}
       </TableCell>
-      <TableCell className="min-w-[160px]">—</TableCell>
+      <TableCell className="min-w-[160px]">
+        {resumeReady && jdReady ? (
+          <button
+            onClick={() => onShowKeywordFeedback(applicationId)}
+            className="bg-emerald-600 text-white px-3 py-1 rounded hover:bg-emerald-700 text-sm"
+          >
+            Show Feedback
+          </button>
+        ) : (
+          <span className="text-gray-400 text-sm">—</span>
+        )}
+      </TableCell>
     </TableRow>
   );
 }

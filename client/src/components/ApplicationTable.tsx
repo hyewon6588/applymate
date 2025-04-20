@@ -16,6 +16,8 @@ import useIsMobile from "@/hooks/useIsMobile";
 
 export default function ApplicationTable() {
   const [rows, setRows] = useState<any[]>([]);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackKeywords, setFeedbackKeywords] = useState<string[]>([]);
   // const addRow = () => setRows((prev) => [...prev, Date.now()]);
   const isMobile = useIsMobile();
 
@@ -57,6 +59,20 @@ export default function ApplicationTable() {
       setRows(data);
     } catch (err) {
       console.error("❌ Failed to fetch applications", err);
+    }
+  };
+
+  const handleShowKeywordFeedback = async (applicationId: string) => {
+    try {
+      const res = await fetch(
+        `http://localhost:8000/applications/${applicationId}/keyword-feedback`,
+        { method: "POST" }
+      );
+      const result = await res.json();
+      setFeedbackKeywords(result.keyword_feedback || []);
+      setShowFeedbackModal(true);
+    } catch (err) {
+      console.error("❌ Failed to fetch keyword feedback", err);
     }
   };
 
@@ -112,7 +128,11 @@ export default function ApplicationTable() {
 
           <TableBody>
             {rows.map((data) => (
-              <ApplicationRow key={data.application_id} initialData={data} />
+              <ApplicationRow
+                key={data.application_id}
+                initialData={data}
+                onShowKeywordFeedback={handleShowKeywordFeedback}
+              />
             ))}
           </TableBody>
         </Table>
@@ -128,6 +148,45 @@ export default function ApplicationTable() {
           >
             + New Application
           </Button>
+        </div>
+      )}
+
+      {showFeedbackModal && (
+        <div className="fixed inset-0 bg-black/20 z-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-xl shadow-lg w-[600px] max-w-full mx-4 border border-slate-200 text-center">
+            <h2 className="text-xl font-semibold mb-6 text-[#0f172a]">
+              Keyword Feedback
+            </h2>
+
+            <p className="text-sm text-gray-700 font-semibold mb-6">
+              💡 You might consider adding the following terms to improve
+              alignment:
+            </p>
+
+            <div className="flex flex-wrap justify-center gap-2 mb-8">
+              {feedbackKeywords.length > 0 ? (
+                feedbackKeywords.map((kw, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800 font-medium"
+                  >
+                    {kw}
+                  </span>
+                ))
+              ) : (
+                <p className="text-sm text-gray-400">
+                  No missing keywords found.
+                </p>
+              )}
+            </div>
+
+            <button
+              onClick={() => setShowFeedbackModal(false)}
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded text-sm"
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
     </div>
