@@ -14,6 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import useIsMobile from "@/hooks/useIsMobile";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 export default function ApplicationTable() {
   const [rows, setRows] = useState<any[]>([]);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -45,7 +47,7 @@ export default function ApplicationTable() {
         return;
       }
 
-      const res = await fetch("http://localhost:8000/applications/me", {
+      const res = await fetch(`${API_BASE_URL}/applications/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -65,7 +67,7 @@ export default function ApplicationTable() {
   const handleShowKeywordFeedback = async (applicationId: string) => {
     try {
       const res = await fetch(
-        `http://localhost:8000/applications/${applicationId}/keyword-feedback`,
+        `${API_BASE_URL}/applications/${applicationId}/keyword-feedback`,
         { method: "POST" }
       );
       const result = await res.json();

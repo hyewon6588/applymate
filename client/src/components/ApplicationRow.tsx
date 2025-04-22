@@ -8,6 +8,7 @@ import StatusSelector from "./StatusSelector";
 import { jwtDecode } from "jwt-decode";
 
 type StatusType = "saved" | "applied" | "interview" | "offered" | "rejected";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 type UploadedFileEntry = {
   name: string;
@@ -92,7 +93,7 @@ export default function ApplicationRow({
 
   const saveApplicationToDB = debounce(async (data: any) => {
     try {
-      const res = await fetch("http://localhost:8000/applications", {
+      const res = await fetch(`${API_BASE_URL}/applications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -145,7 +146,7 @@ export default function ApplicationRow({
     formData.append("position", position);
 
     try {
-      const res = await fetch("http://localhost:8000/upload/resume", {
+      const res = await fetch(`${API_BASE_URL}/upload/resume`, {
         method: "POST",
         body: formData,
       });
@@ -170,7 +171,7 @@ export default function ApplicationRow({
     setIsCheckingMatch(true);
     try {
       const res = await fetch(
-        `http://localhost:8000/applications/${applicationId}/analyze-match`,
+        `${API_BASE_URL}/applications/${applicationId}/analyze-match`,
         { method: "POST" }
       );
       const result = await res.json();

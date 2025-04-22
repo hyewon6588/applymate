@@ -8,6 +8,7 @@ import { FaCheckCircle } from "react-icons/fa";
 import { FiEdit2 } from "react-icons/fi";
 
 type StatusType = "saved" | "applied" | "interview" | "offered" | "rejected";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 type UploadedFileEntry = {
   name: string;
@@ -66,7 +67,8 @@ export default function ApplicationCard({ initialData }: ApplicationProps) {
 
   const saveApplicationToDB = debounce(async (data: any) => {
     try {
-      const res = await fetch("http://localhost:8000/applications", {
+      // const res = await fetch("http://localhost:8000/applications", {
+      const res = await fetch(`${API_BASE_URL}/applications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -118,7 +120,8 @@ export default function ApplicationCard({ initialData }: ApplicationProps) {
     formData.append("position", position);
 
     try {
-      const res = await fetch("http://localhost:8000/upload/resume", {
+      // const res = await fetch("http://localhost:8000/upload/resume", {
+      const res = await fetch(`${API_BASE_URL}/upload/resume`, {
         method: "POST",
         body: formData,
       });
