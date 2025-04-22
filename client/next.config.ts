@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
       ...(config.resolve.alias || {}),
       "@": path.resolve(__dirname, "src"),
     };
+    config.resolve.extensions?.push(".ts", ".tsx");
+    config.resolve.modules = [path.resolve(__dirname), "node_modules"];
     return config;
   },
 };
