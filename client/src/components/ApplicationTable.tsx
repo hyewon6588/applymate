@@ -15,9 +15,25 @@ import { Button } from "@/components/ui/button";
 import useIsMobile from "@/hooks/useIsMobile";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+type StatusType = "saved" | "applied" | "interview" | "offered" | "rejected";
+type UploadedFileEntry = {
+  name: string;
+  url: string;
+};
+
+type ApplicationType = {
+  application_id: string;
+  user_id?: string;
+  company: string;
+  position: string;
+  location: string;
+  status: StatusType;
+  uploadedFiles: Record<string, UploadedFileEntry | null>;
+  match_score?: number;
+};
 
 export default function ApplicationTable() {
-  const [rows, setRows] = useState<any[]>([]);
+  const [rows, setRows] = useState<ApplicationType[]>([]);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedbackKeywords, setFeedbackKeywords] = useState<string[]>([]);
   // const addRow = () => setRows((prev) => [...prev, Date.now()]);

@@ -27,11 +27,16 @@ type ApplicationProps = {
   };
 };
 
-const debounce = (func: Function, delay: number) => {
+const debounce = <T extends unknown[]>(
+  func: (...args: T) => void | Promise<void>,
+  delay: number
+): ((...args: T) => void) => {
   let timer: ReturnType<typeof setTimeout>;
-  return (...args: any[]) => {
+  return (...args: T) => {
     clearTimeout(timer);
-    timer = setTimeout(() => func(...args), delay);
+    timer = setTimeout(() => {
+      void func(...args);
+    }, delay);
   };
 };
 
@@ -65,20 +70,22 @@ export default function ApplicationCard({ initialData }: ApplicationProps) {
   );
   const hasChanged = useRef(false);
 
-  const saveApplicationToDB = debounce(async (data: any) => {
-    try {
-      // const res = await fetch("http://localhost:8000/applications", {
-      const res = await fetch(`${API_BASE_URL}/applications`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const result = await res.json();
-      console.log("✅ Synced to backend:", result);
-    } catch (err) {
-      console.error("❌ Save failed:", err);
-    }
-  }, 800);
+  const saveApplicationToDB = debounce<[ApplicationProps["initialData"]]>(
+    async (data) => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/applications`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const result = await res.json();
+        console.log("✅ Synced to backend:", result);
+      } catch (err) {
+        console.error("❌ Save failed:", err);
+      }
+    },
+    800
+  );
 
   useEffect(() => {
     didMount.current = true;

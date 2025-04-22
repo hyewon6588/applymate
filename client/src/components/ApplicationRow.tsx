@@ -46,11 +46,16 @@ function getUserIdFromToken(): string | null {
   }
 }
 
-const debounce = (func: Function, delay: number) => {
+const debounce = <T extends unknown[]>(
+  func: (...args: T) => void | Promise<void>,
+  delay: number
+): ((...args: T) => void) => {
   let timer: ReturnType<typeof setTimeout>;
-  return (...args: any[]) => {
+  return (...args: T) => {
     clearTimeout(timer);
-    timer = setTimeout(() => func(...args), delay);
+    timer = setTimeout(() => {
+      void func(...args);
+    }, delay);
   };
 };
 
@@ -91,19 +96,22 @@ export default function ApplicationRow({
   );
   const hasChanged = useRef(false);
 
-  const saveApplicationToDB = debounce(async (data: any) => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/applications`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const result = await res.json();
-      console.log("✅ Synced to backend:", result);
-    } catch (err) {
-      console.error("❌ Save failed:", err);
-    }
-  }, 800);
+  const saveApplicationToDB = debounce<[ApplicationRowProps["initialData"]]>(
+    async (data) => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/applications`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const result = await res.json();
+        console.log("✅ Synced to backend:", result);
+      } catch (err) {
+        console.error("❌ Save failed:", err);
+      }
+    },
+    800
+  );
 
   useEffect(() => {
     didMount.current = true;
@@ -129,7 +137,16 @@ export default function ApplicationRow({
       status,
       uploadedFiles,
     });
-  }, [company, position, location, status, uploadedFiles]);
+  }, [
+    saveApplicationToDB,
+    applicationId,
+    userId,
+    company,
+    position,
+    location,
+    status,
+    uploadedFiles,
+  ]);
 
   const handleFileUpload = async (fileType: string, file: File | null) => {
     if (!file) return;
