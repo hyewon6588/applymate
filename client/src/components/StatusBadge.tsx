@@ -1,6 +1,6 @@
 // src/components/StatusBadge.tsx
 
-import { cn } from "../lib/utils.ts";
+import { cn } from "../lib/utils";
 
 export default function StatusBadge({
   status,
