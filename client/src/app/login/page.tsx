@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { login } from "@/lib/auth.ts";
+import { login } from "../../lib/auth.ts";
 import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import BackgroundSection from "@/components/BackgroundSection";
