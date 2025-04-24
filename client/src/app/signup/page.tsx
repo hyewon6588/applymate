@@ -112,15 +112,15 @@ export default function SignupPage() {
   return (
     <BackgroundSection>
       <div
-        className="flex flex-col justify-start h-full mt-7"
-        style={{ marginRight: "60px" }}
+        className="flex flex-col justify-start h-full"
+        style={{ marginRight: "60px", marginTop: "-90px" }}
       >
         <Logo size="large" />
         <Image
           src="/pictures/illustration_signup.png"
           alt="Sign up illustration"
-          width={400}
-          height={400}
+          width={370}
+          height={370}
           className="object-contain"
         />
       </div>
