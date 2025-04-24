@@ -48,7 +48,9 @@ export default function LoginPage() {
     <BackgroundSection>
       {/* Illustration */}
       <div className="flex flex-col justify-start">
-        <Logo size="large" />
+        <Link href="/">
+          <Logo size="large" />
+        </Link>
         <img
           src="/pictures/illustration_login.png"
           alt="Login illustration"

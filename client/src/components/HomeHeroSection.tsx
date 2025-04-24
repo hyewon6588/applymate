@@ -2,11 +2,8 @@
 
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import { useRef } from "react";
 
 export default function HomeHeroSection() {
-  const featureRef = useRef<HTMLElement | null>(null);
-
   const handleScroll = () => {
     const el = document.getElementById("feature-section");
     if (el) {

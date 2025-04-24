@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import BackgroundSection from "@/components/BackgroundSection";
 import Logo from "@/components/Logo";
+import Link from "next/link";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -115,7 +116,9 @@ export default function SignupPage() {
         className="flex flex-col justify-start h-full"
         style={{ marginRight: "60px", marginTop: "-90px" }}
       >
-        <Logo size="large" />
+        <Link href="/">
+          <Logo size="large" />
+        </Link>
         <Image
           src="/pictures/illustration_signup.png"
           alt="Sign up illustration"
