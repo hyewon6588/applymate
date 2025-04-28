@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ApplyMate",
   description: "Track and organize your job applications effortlessly",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
