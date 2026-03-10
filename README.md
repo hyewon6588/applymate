@@ -2,19 +2,85 @@
 
 **Rate: Organized, Yours.**
 
-ApplyMate is an AI-powered job application tracking tool that helps users manage job applications, evaluate resume-job match percentages, and receive keyword-based feedback to optimize their applications. Built with a modern tech stack, ApplyMate brings automation and insight to the job hunt process.
+ApplyMate is an AI-powered job application tracker using semantic similarity and FastAPI that helps users manage job applications, evaluate resume-job match percentages, and receive keyword-based feedback to improve application quality.
+
+It combines full-stack web development with semantic similarity scoring to help users understand how closely their resume aligns with a job posting.
+
+---
+
+## Overview
+
+ApplyMate was built to make the job application process more structured and data-driven. Instead of manually comparing a resume against each job description, users can upload both documents and receive an AI-assisted evaluation.
+
+The platform helps users:
+
+- track job applications in one place
+- measure resume-job alignment
+- identify missing keywords or weak areas
+- manage related documents securely
 
 ---
 
 ## Features
 
-- **Application Tracker** – Add and manage job applications with fields like company, position, location, and status.
-- **File Uploads** – Attach resume, job posting, cover letter, and transcript documents.
-- **Match % Calculation** – Automatically compute how well your resume aligns with a job posting.
-- **Keyword Feedback** – Identify missing keywords or skills that could improve your resume for a specific job.
-- **AI-Driven Analysis** – Powered by `sentence-transformers/all-mpnet-base-v2` for semantic similarity.
-- **Storage** – Uploaded files are securely stored via Supabase.
-- **Full-Stack Web App** – Built with FastAPI (backend) and Next.js (frontend), styled using Tailwind CSS.
+### Application Tracker
+Add and manage job applications with fields such as:
+
+- company
+- position
+- location
+- application status
+
+### File Uploads
+Upload and store important job application documents, including:
+
+- resume
+- job posting
+- cover letter
+- transcript
+
+### Match Percentage Calculation
+Calculate how well a resume aligns with a job posting using semantic similarity scoring.
+
+### Keyword Feedback
+Highlight missing or weak keywords by comparing resume content against the job posting.
+
+### AI-Driven Analysis
+Use sentence-transformers embeddings to evaluate semantic similarity beyond simple keyword overlap.
+
+### Secure Storage
+Store uploaded files through Supabase Storage.
+
+### Full-Stack Web Application
+Built with a modern full-stack architecture using Next.js, FastAPI, MongoDB, and Tailwind CSS.
+
+---
+
+ApplyMate processes resumes and job postings through an AI-powered matching pipeline.
+
+```text
+User Upload Resume / Job Posting
+        │
+        ▼
+Next.js Frontend
+        │
+        ▼
+FastAPI Backend
+        │
+        ├── Text preprocessing
+        ├── Embedding generation
+        │      (sentence-transformers/all-mpnet-base-v2)
+        ├── Cosine similarity calculation
+        └── Keyword gap analysis
+                │
+                ▼
+MongoDB Storage
+                │
+                ▼
+Match Score + Feedback returned to UI
+```
+
+The frontend handles the user workflow and dashboard experience, while the backend coordinates document processing, matching logic, and data persistence.
 
 ---
 
@@ -28,6 +94,63 @@ ApplyMate is an AI-powered job application tracking tool that helps users manage
 | Database     | [MongoDB](https://www.mongodb.com/)                         |
 | File Storage | [Supabase](https://supabase.com/)                           |
 | AI Model     | `sentence-transformers/all-mpnet-base-v2` (via HuggingFace) |
+
+---
+
+### API Design
+
+The backend exposes RESTful APIs for application management and AI-based resume analysis.
+
+## Example endpoints
+```text
+POST /upload/resume
+POST /{application_id}/analyze-match
+POST /{application_id}/keyword-feedback
+GET  /applications/me
+```
+
+## Example request flow
+```text
+Resume + Job Posting
+        │
+        ▼
+/analyze/match
+        │
+        ▼
+Embedding generation
+        │
+        ▼
+Cosine similarity scoring
+        │
+        ▼
+Match percentage + keyword feedback
+```
+
+---
+
+## AI Matching Logic
+
+ApplyMate evaluates resume-job alignment using semantic similarity and keyword analysis.
+
+Matching pipeline
+
+**1. Extract text from the uploaded resume and job posting**
+
+**2. Generate embeddings using sentence-transformers/all-mpnet-base-v2**
+
+**3. Compute cosine similarity between the two embeddings**
+
+**4. Generate a match percentage**
+
+**5. Detect missing or weak keywords relative to the job description**
+
+This approach allows the system to capture semantic similarity rather than relying only on exact keyword matches.
+
+## Why this matters
+
+Traditional keyword matching can miss strong alignment when similar concepts are phrased differently. ApplyMate improves this by comparing meaning at the embedding level.
+
+Handles resume-job semantic similarity scoring using sentence-transformer embeddings.
 
 ---
 
@@ -83,15 +206,6 @@ NEXT_PUBLIC_ENV=production
 
 ---
 
-## 🧪 AI Matching Logic
-
-Match percentages and keyword feedback are generated by comparing embeddings from the `all-mpnet-base-v2` model:
-
-- **Match %**: Cosine similarity between job posting and resume.
-- **Keyword Feedback**: Missing terms are extracted by analyzing term overlap and relevance.
-
----
-
 ## 📦 Deployment
 
 You can deploy:
@@ -102,3 +216,7 @@ You can deploy:
 - **File Storage**: Supabase Storage
 
 ---
+
+### Project Goal
+
+The goal of ApplyMate is to turn job application management into a more organized and measurable process by combining backend APIs, document workflows, and AI-assisted analysis in a single product.
